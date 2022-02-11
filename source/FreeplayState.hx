@@ -151,6 +151,8 @@ class FreeplayState extends MusicBeatState
 		#if sys
 		ArtemisIntegration.setBackgroundFlxColor (intendedColor);
 		#end
+		
+		setInstrumental();
 
 		if(lastDifficultyName == '')
 		{
@@ -226,7 +228,6 @@ class FreeplayState extends MusicBeatState
 	}*/
 
 	var instPlaying:Int = -1;
-	private static var vocals:FlxSound = null;
 	var holdTime:Float = 0;
 	override function update(elapsed:Float)
 	{
@@ -311,31 +312,6 @@ class FreeplayState extends MusicBeatState
 			persistentUpdate = false;
 			openSubState(new GameplayChangersSubstate());
 		}
-		else if(space)
-		{
-			if(instPlaying != curSelected)
-			{
-				#if PRELOAD_ALL
-				destroyFreeplayVocals();
-				FlxG.sound.music.volume = 0;
-				Paths.currentModDirectory = songs[curSelected].folder;
-				var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
-				PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
-				if (PlayState.SONG.needsVoices)
-					vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
-				else
-					vocals = new FlxSound();
-
-				FlxG.sound.list.add(vocals);
-				FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 0.7);
-				vocals.play();
-				vocals.persist = true;
-				vocals.looped = true;
-				vocals.volume = 0.7;
-				instPlaying = curSelected;
-				#end
-			}
-		}
 
 		else if (accepted)
 		{
@@ -369,8 +345,6 @@ class FreeplayState extends MusicBeatState
 			}
 
 			FlxG.sound.music.volume = 0;
-					
-			destroyFreeplayVocals();
 		}
 		else if(controls.RESET)
 		{
@@ -378,14 +352,6 @@ class FreeplayState extends MusicBeatState
 			FlxG.sound.play(Paths.sound('scrollMenu'));
 		}
 		super.update(elapsed);
-	}
-
-	public static function destroyFreeplayVocals() {
-		if(vocals != null) {
-			vocals.stop();
-			vocals.destroy();
-		}
-		vocals = null;
 	}
 
 	function changeDiff(change:Int = 0)
@@ -419,6 +385,8 @@ class FreeplayState extends MusicBeatState
 			curSelected = songs.length - 1;
 		if (curSelected >= songs.length)
 			curSelected = 0;
+
+		setInstrumental();
 			
 		var newColor:Int = songs[curSelected].color;
 		if(newColor != intendedColor) {
@@ -510,6 +478,18 @@ class FreeplayState extends MusicBeatState
 		scoreBG.x = FlxG.width - (scoreBG.scale.x / 2);
 		diffText.x = Std.int(scoreBG.x + (scoreBG.width / 2));
 		diffText.x -= diffText.width / 2;
+	}
+
+	private function setInstrumental() {
+		#if PRELOAD_ALL
+		FlxG.sound.music.volume = 0;
+		Paths.currentModDirectory = songs[curSelected].folder;
+		var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
+		PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
+
+		FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 0.7);
+		instPlaying = curSelected;
+		#end
 	}
 }
 
