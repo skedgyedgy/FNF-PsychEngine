@@ -41,6 +41,8 @@ class FreeplayState extends MusicBeatState
 	var intendedScore:Int = 0;
 	var intendedRating:Float = 0;
 
+	var waitFrames:Int = 60;
+
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var curPlaying:Bool = false;
 
@@ -351,6 +353,8 @@ class FreeplayState extends MusicBeatState
 			openSubState(new ResetScoreSubState(songs[curSelected].songName, curDifficulty, songs[curSelected].songCharacter));
 			FlxG.sound.play(Paths.sound('scrollMenu'));
 		}
+
+		if (--waitFrames == 0) setInstrumental();
 		super.update(elapsed);
 	}
 
@@ -386,7 +390,7 @@ class FreeplayState extends MusicBeatState
 		if (curSelected >= songs.length)
 			curSelected = 0;
 
-		setInstrumental();
+		waitFrames = 60;
 			
 		var newColor:Int = songs[curSelected].color;
 		if(newColor != intendedColor) {
