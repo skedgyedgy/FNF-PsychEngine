@@ -186,15 +186,15 @@ class FreeplayState extends MusicBeatState
 		textBG.alpha = 0.6;
 		add(textBG);
 
-		#if PRELOAD_ALL
-		setInstrumental();
-		#end
 		var leText:String = "Press CTRL to open the Gameplay Changers Menu / Press RESET to Reset your Score and Accuracy.";
 		var size:Int = 18;
 		var text:FlxText = new FlxText(textBG.x, textBG.y + 4, FlxG.width, leText, size);
 		text.setFormat(Paths.font("vcr.ttf"), size, FlxColor.WHITE, RIGHT);
 		text.scrollFactor.set();
 		add(text);
+
+		setInstrumental();
+
 		super.create();
 	}
 
@@ -350,7 +350,7 @@ class FreeplayState extends MusicBeatState
 			FlxG.sound.play(Paths.sound('scrollMenu'));
 		}
 
-		if (--waitFrames == 0) setInstrumental();
+		if (instPlaying != curSelected && --waitFrames == 0) setInstrumental();
 		super.update(elapsed);
 	}
 
