@@ -1,5 +1,7 @@
 package;
 
+import flixel.system.scaleModes.*;
+import flixel.system.scaleModes.FillScaleMode;
 import Conductor.BPMChangeEvent;
 import flixel.FlxG;
 import flixel.addons.ui.FlxUIState;
@@ -21,6 +23,12 @@ class MusicBeatState extends FlxUIState
 
 	private var curStep:Int = 0;
 	private var curBeat:Int = 0;
+	public static var musInstance:MusicBeatState;
+	#if desktop
+	public var scaleRatio = ClientPrefs.getResolution()[1] / 720;
+	var modeRatio:RatioScaleMode;
+	var modeStage:StageSizeScaleMode;
+	#end
 
 	private var controls(get, never):Controls;
 
@@ -30,6 +38,13 @@ class MusicBeatState extends FlxUIState
 	override function create() {
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 		super.create();
+		musInstance = this;
+		// Custom made Trans out
+		
+		#if desktop
+		modeRatio = new RatioScaleMode();
+		modeStage = new StageSizeScaleMode();
+		#end
 
 		if(!skip) {
 			openSubState(new CustomFadeTransition(0.7, true));
@@ -62,7 +77,12 @@ class MusicBeatState extends FlxUIState
 		if (oldStep != curStep && curStep > 0)
 			stepHit();
 
-		if(FlxG.save.data != null) FlxG.save.data.fullscreen = FlxG.fullscreen;
+		// if(FlxG.save.data != null) FlxG.save.data.fullscreen = FlxG.fullscreen; no
+
+		if (FlxG.keys.pressed.ALT && FlxG.keys.justPressed.ENTER && FlxG.fullscreen) {
+			if (FlxG.fullscreen && ClientPrefs.screenScaleMode == "ADAPTIVE") FlxG.fullscreen = false;
+			FlxG.save.data.fullscreen = FlxG.fullscreen;
+		}
 
 		super.update(elapsed);
 	}
@@ -99,6 +119,7 @@ class MusicBeatState extends FlxUIState
 			leState.openSubState(new CustomFadeTransition(0.6, false));
 			if(nextState == FlxG.state) {
 				CustomFadeTransition.finishCallback = function() {
+					musInstance.fixAspectRatio();
 					#if sys
 					ArtemisIntegration.toggleFade (false);
 					#end
@@ -107,6 +128,7 @@ class MusicBeatState extends FlxUIState
 				//trace('resetted');
 			} else {
 				CustomFadeTransition.finishCallback = function() {
+					musInstance.fixAspectRatio();
 					#if sys
 					ArtemisIntegration.toggleFade (false);
 					#end
@@ -139,5 +161,21 @@ class MusicBeatState extends FlxUIState
 	public function beatHit():Void
 	{
 		//do literally nothing dumbass
+	}
+
+	public function fixAspectRatio() {
+		// options.GraphicsSettingsSubState.onChangeRes();
+
+		#if desktop
+		if (ClientPrefs.screenScaleMode == "LETTERBOX") {
+			FlxG.scaleMode = new RatioScaleMode (false);
+		} else if (ClientPrefs.screenScaleMode == "PAN") {
+			FlxG.scaleMode = new RatioScaleMode (true);
+		} else if (ClientPrefs.screenScaleMode == "STRETCH") {
+			FlxG.scaleMode = new FillScaleMode ();
+		} else if (ClientPrefs.screenScaleMode == "ADAPTIVE") {
+			FlxG.scaleMode = modeStage;
+		}
+		#end
 	}
 }

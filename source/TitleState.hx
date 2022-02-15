@@ -1,5 +1,6 @@
 package;
 
+import flixel.system.scaleModes.RatioScaleMode;
 #if desktop
 import Discord.DiscordClient;
 import sys.thread.Thread;
@@ -427,6 +428,10 @@ class TitleState extends MusicBeatState
 	{
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
+
+		if (FlxG.keys.justPressed.F && ClientPrefs.screenScaleMode != "ADAPTIVE") {
+			FlxG.fullscreen = !FlxG.fullscreen;
+		}
 		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
 
 		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER || controls.ACCEPT;

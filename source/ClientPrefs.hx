@@ -95,6 +95,12 @@ class ClientPrefs {
 		defaultKeys = keyBinds.copy();
 		//trace(defaultKeys);
 	}
+	
+	public static function resizeScreen() {
+		if(FlxG.save.data.screenRes != null) {
+			screenRes = FlxG.save.data.screenRes;
+		}
+	}
 
 	public static function saveSettings() {
 		FlxG.save.data.downScroll = downScroll;
@@ -132,6 +138,8 @@ class ClientPrefs {
 		FlxG.save.data.enableArtemis = enableArtemis;
 		FlxG.save.data.gameplaySettings = gameplaySettings;
 		FlxG.save.data.controllerMode = controllerMode;
+		FlxG.save.data.screenRes = screenRes;
+		FlxG.save.data.screenScaleMode = screenScaleMode;
 	
 		FlxG.save.flush();
 
@@ -237,6 +245,12 @@ class ClientPrefs {
 		if(FlxG.save.data.controllerMode != null) {
 			controllerMode = FlxG.save.data.controllerMode;
 		}
+		if(FlxG.save.data.screenRes != null) {
+			screenRes = FlxG.save.data.screenRes;
+		}
+		if(FlxG.save.data.screenScaleMode != null) {
+			screenScaleMode = FlxG.save.data.screenScaleMode;
+		}
 		if (FlxG.save.data.enableArtemis != null) {
 			enableArtemis = FlxG.save.data.enableArtemis;
 		}
@@ -276,6 +290,16 @@ class ClientPrefs {
 		}
 	}
 
+	public static function getResolution():Array<Int>{
+		var res = ClientPrefs.screenRes.split(" x ");
+		
+		if (ClientPrefs.screenRes == "FULLSCREEN") res = ["1280", "720"];
+		
+		
+		
+		return [Std.parseInt(res[0]),Std.parseInt(res[1])];
+	}
+	
 	inline public static function getGameplaySetting(name:String, defaultValue:Dynamic):Dynamic {
 		return /*PlayState.isStoryMode ? defaultValue : */ (gameplaySettings.exists(name) ? gameplaySettings.get(name) : defaultValue);
 	}
