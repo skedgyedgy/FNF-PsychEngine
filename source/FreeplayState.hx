@@ -153,8 +153,6 @@ class FreeplayState extends MusicBeatState
 		#if sys
 		ArtemisIntegration.setBackgroundFlxColor (intendedColor);
 		#end
-		
-		setInstrumental();
 
 		if(lastDifficultyName == '')
 		{
@@ -191,6 +189,7 @@ class FreeplayState extends MusicBeatState
 		#if PRELOAD_ALL
 		var leText:String = "Press SPACE to listen to the Song / Press CTRL to open the Gameplay Changers Menu / Press RESET to Reset your Score and Accuracy.";
 		var size:Int = 16;
+		setInstrumental();
 		#else
 		var leText:String = "Press CTRL to open the Gameplay Changers Menu / Press RESET to Reset your Score and Accuracy.";
 		var size:Int = 18;
